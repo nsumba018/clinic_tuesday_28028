@@ -1,0 +1,13 @@
+package kigali.clinic.rw.service;
+
+import kigali.clinic.rw.domain.Doctor;
+import kigali.clinic.rw.domain.Office;
+
+import java.util.List;
+
+public interface DoctorService {
+    String saveDoctor(Doctor doctor);
+    List<Doctor> getDoctors();
+    String deleteDoctor(Long id);
+    String updateDoctor(Doctor doctor);
+}
