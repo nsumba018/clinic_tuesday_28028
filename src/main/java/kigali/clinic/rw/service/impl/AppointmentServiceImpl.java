@@ -7,6 +7,7 @@ import kigali.clinic.rw.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,5 +25,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Appointment> getAppointmentsByStatus(AppointmentStatus status) {
         return appointmentRepository.findByStatusOrderByAppointmentDateAsc(status);
+    }
+
+    @Override
+    public List<Appointment> getAppointmentsBetween(LocalDate start, LocalDate end) {
+        return appointmentRepository.findByAppointmentDateBetweenOrderByAppointmentDateAsc(start, end);
     }
 }

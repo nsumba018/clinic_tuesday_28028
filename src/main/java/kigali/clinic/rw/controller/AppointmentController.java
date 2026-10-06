@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -36,6 +37,15 @@ public class AppointmentController {
     @GetMapping("/by-status")
     public ResponseEntity<?> getAppointmentsByStatus(@RequestParam AppointmentStatus status){
         List<Appointment> appointments = appointeService.getAppointmentsByStatus(status);
+        return ResponseEntity.status(HttpStatus.OK).body(appointments);
+    }
+
+    // A3: the dates come as Strings, so we change them to LocalDate here
+    @GetMapping("/between")
+    public ResponseEntity<?> getAppointmentsBetween(@RequestParam String start, @RequestParam String end){
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+        List<Appointment> appointments = appointeService.getAppointmentsBetween(startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(appointments);
     }
 }

@@ -7,12 +7,15 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
-    // A2 (DERIVED): appointments with that status, earliest date first
+    // A2
     List<Appointment> findByStatusOrderByAppointmentDateAsc(AppointmentStatus status);
 
+    // A3 (DERIVED): appointments between two dates (both included), ordered by date
+    List<Appointment> findByAppointmentDateBetweenOrderByAppointmentDateAsc(LocalDate start, LocalDate end);
 }

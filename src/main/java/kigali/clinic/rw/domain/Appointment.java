@@ -1,6 +1,6 @@
 package kigali.clinic.rw.domain;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ public class Appointment {
     private Long id;
 
     @Column(name="appointment_date")
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
 
     @Column(name="reason")
     private String reason;
