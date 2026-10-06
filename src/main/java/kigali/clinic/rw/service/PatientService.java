@@ -9,4 +9,8 @@ public interface PatientService {
     List<Patient> getPatients();
     String deletePatient(Long id);
     String updatePatient(Patient patient);
+
+    List<Patient> getPatientsByLastName(String lastName);
+    List<Patient> getPatientsOfDoctor(Long doctorId);
+    List<Patient> getFrequentPatients(long min);
 }

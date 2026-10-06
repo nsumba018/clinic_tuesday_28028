@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
+import java.util.List;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     @Transactional
@@ -15,5 +16,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             update Patient p set p.firstName = ?1, p.lastName = ?2, p.dateOfBirth = ?3
             where p.id = ?4""")
     int updatePatientById(String firstName, String lastName, Date dateOfBirth, Long id);
+
+    List<Patient> findPatientByLastNameIgnoreCaseByFirstNameAsc(String lastName);
 
 }

@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,7 +32,13 @@ public class Doctor {
     @JoinColumn(name="office_id")
     private Office office;
 
-    @ManyToMany(mappedBy = "doctors")
+    @ManyToMany
+    @JoinTable(
+       name = "doctor_specialization",
+       joinColumns = @JoinColumn(name="doctor_id"),
+       inverseJoinColumns = @JoinColumn(name="specialization_id")
+    )
+    @JsonIgnoreProperties("doctors")
     private List<Specialization> specializations = new ArrayList<>();
 
     @OneToMany(mappedBy = "doctor")

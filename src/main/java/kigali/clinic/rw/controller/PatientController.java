@@ -48,5 +48,12 @@ public class PatientController {
         return  ResponseEntity.status(HttpStatus.OK).body("Patient updated successfully");
     }
 
+    @GetMapping("/by-last-name")
+    public ResponseEntity<?> getPatientsByLastName(@RequestParam String lastName){
+        List<Patient> patients = patientService.getPatientsByLastName(lastName);
+        return ResponseEntity.status(HttpStatus.OK).body(patients);
+    }
+
+
 
 }

@@ -45,4 +45,9 @@ public class PatientServiceImpl implements PatientService {
                 patient.getDateOfBirth(), patient.getId());
         return "Patient updated successfully";
     }
+
+    @Override
+    public List<Patient> getPatientsByLastName(String lastName) {
+        return patientRepository.findPatientByLastNameIgnoreCaseByFirstNameAsc(lastName);
+    }
 }
