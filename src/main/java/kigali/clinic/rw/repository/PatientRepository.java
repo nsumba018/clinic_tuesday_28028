@@ -23,4 +23,12 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     // B4
     @Query("select distinct a.patient from Appointment a where a.doctor.id = ?1")
     List<Patient> findPatientsOfDoctor(Long doctorId);
+
+    // C2
+    @Query("""
+            select p from Appointment a join a.patient p
+            group by p
+            having count(a) >= ?1
+            order by count(a) desc""")
+    List<Patient> findFrequentPatients(long min);
 }

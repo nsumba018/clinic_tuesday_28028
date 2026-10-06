@@ -55,4 +55,9 @@ public class PatientServiceImpl implements PatientService {
     public List<Patient> getPatientsOfDoctor(Long doctorId) {
         return patientRepository.findPatientsOfDoctor(doctorId);
     }
+
+    @Override
+    public List<Patient> getFrequentPatients(long min) {
+        return patientRepository.findFrequentPatients(min);
+    }
 }

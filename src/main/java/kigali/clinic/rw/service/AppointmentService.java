@@ -10,4 +10,6 @@ public interface AppointmentService {
     String saveAppointment(Appointment appointment);
     List<Appointment> getAppointmentsByStatus(AppointmentStatus status);
     List<Appointment> getAppointmentsBetween(LocalDate start, LocalDate end);
+
+    List<Object[]> countAppointmentsByStatus();
 }

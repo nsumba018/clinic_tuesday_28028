@@ -37,4 +37,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     public List<Appointment> getAppointmentsBetween(LocalDate start, LocalDate end) {
         return appointmentRepository.findByAppointmentDateBetweenOrderByAppointmentDateAsc(start, end);
     }
+
+    @Override
+    public List<Object[]> countAppointmentsByStatus() {
+        return appointmentRepository.countAppointmentsByStatus();
+    }
 }

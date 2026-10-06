@@ -48,4 +48,11 @@ public class AppointmentController {
         List<Appointment> appointments = appointeService.getAppointmentsBetween(startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(appointments);
     }
+
+    // C1
+    @GetMapping("/stats/by-status")
+    public ResponseEntity<?> countAppointmentsByStatus(){
+        List<Object[]> stats = appointeService.countAppointmentsByStatus();
+        return ResponseEntity.status(HttpStatus.OK).body(stats);
+    }
 }

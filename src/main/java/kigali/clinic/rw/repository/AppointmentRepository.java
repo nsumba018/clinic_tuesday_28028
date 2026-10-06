@@ -3,6 +3,7 @@ package kigali.clinic.rw.repository;
 import kigali.clinic.rw.domain.Appointment;
 import kigali.clinic.rw.domain.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -21,4 +22,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     // A4
     boolean existsByDoctorIdAndAppointmentDateAndStatusNot(Long doctorId, LocalDate appointmentDate, AppointmentStatus status);
+
+    // C1
+    @Query("select a.status, count(a) from Appointment a group by a.status")
+    List<Object[]> countAppointmentsByStatus();
 }

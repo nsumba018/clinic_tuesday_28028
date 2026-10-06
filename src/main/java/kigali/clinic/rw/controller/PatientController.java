@@ -65,4 +65,11 @@ public class PatientController {
         List<Patient> patients = patientService.getPatientsOfDoctor(doctorId);
         return ResponseEntity.status(HttpStatus.OK).body(patients);
     }
+
+    // C2
+    @GetMapping("/frequent")
+    public ResponseEntity<?> getFrequentPatients(@RequestParam long min){
+        List<Patient> patients = patientService.getFrequentPatients(min);
+        return ResponseEntity.status(HttpStatus.OK).body(patients);
+    }
 }
