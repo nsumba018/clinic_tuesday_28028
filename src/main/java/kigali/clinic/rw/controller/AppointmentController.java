@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,5 +55,13 @@ public class AppointmentController {
     public ResponseEntity<?> countAppointmentsByStatus(){
         List<Object[]> stats = appointeService.countAppointmentsByStatus();
         return ResponseEntity.status(HttpStatus.OK).body(stats);
+    }
+
+    // C4
+    @PatchMapping("/cancel-day")
+    public ResponseEntity<String> cancelDayOfDoctor(@RequestParam Long doctorId, @RequestParam String date){
+        LocalDate theDate = LocalDate.parse(date);
+        String returnedMsg = appointeService.cancelDayOfDoctor(doctorId, theDate);
+        return ResponseEntity.status(HttpStatus.OK).body(returnedMsg);
     }
 }

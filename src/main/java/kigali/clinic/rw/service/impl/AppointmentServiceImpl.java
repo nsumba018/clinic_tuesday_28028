@@ -6,6 +6,7 @@ import kigali.clinic.rw.repository.AppointmentRepository;
 import kigali.clinic.rw.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -41,5 +42,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public List<Object[]> countAppointmentsByStatus() {
         return appointmentRepository.countAppointmentsByStatus();
+    }
+
+    @Override
+    @Transactional
+    public String cancelDayOfDoctor(Long doctorId, LocalDate date) {
+        int howMany = appointmentRepository.cancelDayOfDoctor(doctorId, date);
+        return howMany + " appointments cancelled";
     }
 }

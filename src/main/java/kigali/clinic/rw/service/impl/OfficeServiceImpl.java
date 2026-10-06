@@ -42,4 +42,9 @@ public class OfficeServiceImpl implements OfficeService {
         offRepo.updateOfficeById(office.getName(), office.getOfficeNumber(), office.getId());
         return "Office updated successfully";
     }
+
+    @Override
+    public List<Object[]> getOfficesByAppointmentCount(){
+        return offRepo.findOfficesByAppointmentCount();
+    }
 }

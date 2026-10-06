@@ -19,7 +19,7 @@ import kigali.clinic.rw.service.OfficeService;
 
 
 @RestController
-@RequestMapping(value="/api/office")
+@RequestMapping(value="/api/offices")
 public class OfficeController {
 
     @Autowired
@@ -56,4 +56,13 @@ public class OfficeController {
         return new ResponseEntity<>("Office has been updated successfully", HttpStatus.OK);
     }
 
+    // C3
+    @GetMapping(value = "/busiest")
+    public ResponseEntity<?> getBusiestOffice(){
+        List<Object[]> offices = offServe.getOfficesByAppointmentCount();
+        if(offices.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body("No appointments yet");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(offices.get(0));
+    }
 }

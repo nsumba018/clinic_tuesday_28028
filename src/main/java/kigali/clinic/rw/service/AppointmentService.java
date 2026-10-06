@@ -12,4 +12,6 @@ public interface AppointmentService {
     List<Appointment> getAppointmentsBetween(LocalDate start, LocalDate end);
 
     List<Object[]> countAppointmentsByStatus();
+
+    String cancelDayOfDoctor(Long doctorId, LocalDate date);
 }
