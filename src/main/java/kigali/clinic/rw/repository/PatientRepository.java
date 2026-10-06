@@ -17,6 +17,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
             where p.id = ?4""")
     int updatePatientById(String firstName, String lastName, Date dateOfBirth, Long id);
 
-    List<Patient> findPatientByLastNameIgnoreCaseByFirstNameAsc(String lastName);
+    List<Patient> findByLastNameIgnoreCaseOrderByFirstNameAsc(String lastName);
 
 }

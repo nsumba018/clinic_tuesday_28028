@@ -48,6 +48,6 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public List<Patient> getPatientsByLastName(String lastName) {
-        return patientRepository.findPatientByLastNameIgnoreCaseByFirstNameAsc(lastName);
+        return patientRepository.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
     }
 }
