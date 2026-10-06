@@ -29,7 +29,7 @@ public class AppointmentController {
         if(returnedMsg.equals("Appointment Saved Successfully")) {
             return new ResponseEntity<>("Appointment Saved Successfully", HttpStatus.CREATED);
         }else{
-            return new ResponseEntity<>(returnedMsg, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(returnedMsg, HttpStatus.CONFLICT);
         }
     }
 

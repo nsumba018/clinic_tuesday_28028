@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctor")
+@RequestMapping("/api/doctors")
 @RequiredArgsConstructor
 public class DoctorController {
 
@@ -49,5 +49,17 @@ public class DoctorController {
         return  ResponseEntity.status(HttpStatus.OK).body("Doctor updated successfully");
     }
 
+    // B1
+    @GetMapping("/by-specialization")
+    public ResponseEntity<?> getDoctorsBySpecialization(@RequestParam String name){
+        List<Doctor> doctors = doctorService.getDoctorsBySpecialization(name);
+        return ResponseEntity.status(HttpStatus.OK).body(doctors);
+    }
 
+    // B2
+    @GetMapping("/without-office")
+    public ResponseEntity<?> getDoctorsWithoutOffice(){
+        List<Doctor> doctors = doctorService.getDoctorsWithoutOffice();
+        return ResponseEntity.status(HttpStatus.OK).body(doctors);
+    }
 }

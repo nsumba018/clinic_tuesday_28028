@@ -16,6 +16,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     // A2
     List<Appointment> findByStatusOrderByAppointmentDateAsc(AppointmentStatus status);
 
-    // A3 (DERIVED): appointments between two dates (both included), ordered by date
+    // A3
     List<Appointment> findByAppointmentDateBetweenOrderByAppointmentDateAsc(LocalDate start, LocalDate end);
+
+    // A4 
+    boolean existsByDoctorIdAndAppointmentDateAndStatusNot(Long doctorId, LocalDate appointmentDate, AppointmentStatus status);
 }

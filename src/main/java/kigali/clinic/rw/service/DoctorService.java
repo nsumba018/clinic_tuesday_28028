@@ -10,4 +10,8 @@ public interface DoctorService {
     List<Doctor> getDoctors();
     String deleteDoctor(Long id);
     String updateDoctor(Doctor doctor);
+
+    List<Doctor> getDoctorsBySpecialization(String name);
+
+    List<Doctor> getDoctorsWithoutOffice();
 }

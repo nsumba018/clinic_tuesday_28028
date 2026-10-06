@@ -58,4 +58,14 @@ public class DoctorServiceImpl implements DoctorService {
                 doctor.getDateOfBirth(), doctor.getId(), doctor.getOffice());
         return "Doctor updated successfully";
     }
+
+    @Override
+    public List<Doctor> getDoctorsBySpecialization(String name) {
+        return doctorRepository.findDoctorsBySpecialization(name);
+    }
+
+    @Override
+    public List<Doctor> getDoctorsWithoutOffice() {
+        return doctorRepository.findDoctorsWithoutOffice();
+    }
 }
