@@ -5,6 +5,8 @@ import kigali.clinic.rw.domain.AppointmentStatus;
 import kigali.clinic.rw.repository.AppointmentRepository;
 import kigali.clinic.rw.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,5 +51,17 @@ public class AppointmentServiceImpl implements AppointmentService {
     public String cancelDayOfDoctor(Long doctorId, LocalDate date) {
         int howMany = appointmentRepository.cancelDayOfDoctor(doctorId, date);
         return howMany + " appointments cancelled";
+    }
+
+    @Override
+    public Page<Appointment> getAppointmentsPage(Pageable pageable) {
+        return appointmentRepository.findAll(pageable);
+    }
+
+    @Override
+    @Transactional
+    public String deleteCancelledBefore(LocalDate date) {
+        int howMany = appointmentRepository.deleteCancelledBefore(date);
+        return howMany + " appointments deleted";
     }
 }

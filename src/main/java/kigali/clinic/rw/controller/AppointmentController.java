@@ -4,8 +4,13 @@ import kigali.clinic.rw.domain.Appointment;
 import kigali.clinic.rw.domain.AppointmentStatus;
 import kigali.clinic.rw.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,6 +67,29 @@ public class AppointmentController {
     public ResponseEntity<String> cancelDayOfDoctor(@RequestParam Long doctorId, @RequestParam String date){
         LocalDate theDate = LocalDate.parse(date);
         String returnedMsg = appointeService.cancelDayOfDoctor(doctorId, theDate);
+        return ResponseEntity.status(HttpStatus.OK).body(returnedMsg);
+    }
+
+    // BN1
+    @GetMapping("/page")
+    public ResponseEntity<?> getAppointmentsPage(@RequestParam int page, @RequestParam int size,
+                                                 @RequestParam String sort){
+        String[] pieces = sort.split(",");
+        Pageable pageable;
+        if(pieces[1].equals("desc")){
+            pageable = PageRequest.of(page, size, Sort.by(pieces[0]).descending());
+        }else{
+            pageable = PageRequest.of(page, size, Sort.by(pieces[0]).ascending());
+        }
+        Page<Appointment> appointmentsPage = appointeService.getAppointmentsPage(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(appointmentsPage);
+    }
+
+    // BN2
+    @DeleteMapping("/cancelled-before")
+    public ResponseEntity<String> deleteCancelledBefore(@RequestParam String date){
+        LocalDate theDate = LocalDate.parse(date);
+        String returnedMsg = appointeService.deleteCancelledBefore(theDate);
         return ResponseEntity.status(HttpStatus.OK).body(returnedMsg);
     }
 }

@@ -37,4 +37,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             where a.doctor.id = ?1 and a.appointmentDate = ?2
             and a.status <> kigali.clinic.rw.domain.AppointmentStatus.COMPLETED""")
     int cancelDayOfDoctor(Long doctorId, LocalDate date);
+
+    // BN2
+    @Transactional
+    @Modifying
+    @Query("""
+            delete from Appointment a
+            where a.status = kigali.clinic.rw.domain.AppointmentStatus.CANCELLED
+            and a.appointmentDate < ?1""")
+    int deleteCancelledBefore(LocalDate date);
 }
