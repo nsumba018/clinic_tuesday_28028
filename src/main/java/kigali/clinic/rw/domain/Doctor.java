@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +42,7 @@ public class Doctor {
     @JsonIgnoreProperties("doctors")
     private List<Specialization> specializations = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "doctor")
     private List<Appointment> appointments = new ArrayList<>();
 }

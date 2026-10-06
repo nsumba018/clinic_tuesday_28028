@@ -21,7 +21,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public String saveAppointment(Appointment appointment) {
-        // A4: the doctor must not already have an appointment on that date (CANCELLED ones do not count)
+        // A4
         boolean alreadyBooked = appointmentRepository.existsByDoctorIdAndAppointmentDateAndStatusNot(
                 appointment.getDoctor().getId(), appointment.getAppointmentDate(), AppointmentStatus.CANCELLED);
         if(alreadyBooked){

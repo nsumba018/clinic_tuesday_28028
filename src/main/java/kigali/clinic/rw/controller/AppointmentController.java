@@ -46,7 +46,7 @@ public class AppointmentController {
         return ResponseEntity.status(HttpStatus.OK).body(appointments);
     }
 
-    // A3: the dates come as Strings, so we change them to LocalDate here
+    // A3
     @GetMapping("/between")
     public ResponseEntity<?> getAppointmentsBetween(@RequestParam String start, @RequestParam String end){
         LocalDate startDate = LocalDate.parse(start);

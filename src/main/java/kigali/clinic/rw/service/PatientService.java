@@ -14,7 +14,4 @@ public interface PatientService {
     List<Patient> getPatientsOfDoctor(Long doctorId);
     List<Patient> getFrequentPatients(long min);
 
-    List<Patient> getPatientsOfDoctor(Long doctorId);
-
-    List<Patient> getFrequentPatients(long min);
 }
