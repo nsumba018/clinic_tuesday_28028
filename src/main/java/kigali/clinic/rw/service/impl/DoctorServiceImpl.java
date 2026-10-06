@@ -68,4 +68,10 @@ public class DoctorServiceImpl implements DoctorService {
     public List<Doctor> getDoctorsWithoutOffice() {
         return doctorRepository.findDoctorsWithoutOffice();
     }
+
+    @Override
+    public boolean doctorExists(Long id) {
+        Optional<Doctor> doctor = doctorRepository.findById(id);
+        return doctor.isPresent();
+    }
 }

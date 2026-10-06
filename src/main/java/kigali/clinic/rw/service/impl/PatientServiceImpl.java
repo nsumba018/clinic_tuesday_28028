@@ -50,4 +50,9 @@ public class PatientServiceImpl implements PatientService {
     public List<Patient> getPatientsByLastName(String lastName) {
         return patientRepository.findByLastNameIgnoreCaseOrderByFirstNameAsc(lastName);
     }
+
+    @Override
+    public List<Patient> getPatientsOfDoctor(Long doctorId) {
+        return patientRepository.findPatientsOfDoctor(doctorId);
+    }
 }

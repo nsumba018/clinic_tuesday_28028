@@ -48,4 +48,9 @@ public class SpecializationServiceImpl implements SpecializationService {
         specializationRepository.updateSpecializationById(specialization.getName(), specialization.getId());
         return "Specialization updated successfully";
     }
+
+    @Override
+    public List<Specialization> getUnusedSpecializations() {
+        return specializationRepository.findUnusedSpecializations();
+    }
 }

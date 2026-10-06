@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/specialization")
+@RequestMapping("/api/specializations")
 @RequiredArgsConstructor
 public class SpecializationController {
 
@@ -48,5 +48,10 @@ public class SpecializationController {
         return  ResponseEntity.status(HttpStatus.OK).body("Specialization updated successfully");
     }
 
-
+    // B3
+    @GetMapping("/unused")
+    public ResponseEntity<?> getUnusedSpecializations(){
+        List<Specialization> specializations = specializationService.getUnusedSpecializations();
+        return ResponseEntity.status(HttpStatus.OK).body(specializations);
+    }
 }

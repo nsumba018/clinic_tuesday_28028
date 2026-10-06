@@ -20,4 +20,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     // A1
     List<Patient> findByLastNameIgnoreCaseOrderByFirstNameAsc(String lastName);
 
+    // B4
+    @Query("select distinct a.patient from Appointment a where a.doctor.id = ?1")
+    List<Patient> findPatientsOfDoctor(Long doctorId);
 }

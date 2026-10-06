@@ -9,4 +9,6 @@ public interface SpecializationService {
     List<Specialization> getSpecializations();
     String deleteSpecialization(Long id);
     String updateSpecialization(Specialization specialization);
+
+    List<Specialization> getUnusedSpecializations();
 }

@@ -1,6 +1,7 @@
 package kigali.clinic.rw.controller;
 
 import kigali.clinic.rw.domain.Patient;
+import kigali.clinic.rw.service.DoctorService;
 import kigali.clinic.rw.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 public class PatientController {
 
     private final PatientService patientService;
+    private final DoctorService doctorService;
 
     @PostMapping("/save")
     public ResponseEntity<String> savePatient(@RequestBody Patient patient){
@@ -54,6 +56,13 @@ public class PatientController {
         return ResponseEntity.status(HttpStatus.OK).body(patients);
     }
 
-
-
+    // B4
+    @GetMapping("/of-doctor/{doctorId}")
+    public ResponseEntity<?> getPatientsOfDoctor(@PathVariable Long doctorId){
+        if(!doctorService.doctorExists(doctorId)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The doctor with that id does not exist");
+        }
+        List<Patient> patients = patientService.getPatientsOfDoctor(doctorId);
+        return ResponseEntity.status(HttpStatus.OK).body(patients);
+    }
 }

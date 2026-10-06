@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface SpecializationRepository extends JpaRepository<Specialization, Long> {
     boolean existsByName(String name);
 
@@ -16,4 +18,7 @@ public interface SpecializationRepository extends JpaRepository<Specialization, 
             where s.id = ?2""")
     int updateSpecializationById(String name, Long id);
 
+    // B3
+    @Query("select s from Specialization s where s.doctors is empty")
+    List<Specialization> findUnusedSpecializations();
 }
