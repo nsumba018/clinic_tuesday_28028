@@ -40,6 +40,16 @@ public class OfficeServiceImpl implements OfficeService {
     }
 
     @Override
+    public String deleteOfficeByNumber(int officeNumber){
+        Optional<Office> checkOffice = offRepo.findByOfficeNumber(officeNumber);
+        if(checkOffice.isEmpty()){
+            return "Office not found";
+        }
+        offRepo.delete(checkOffice.get());
+        return "Office is deleted successfully";
+    }
+
+    @Override
     public String updateOffice(Office office){
         offRepo.updateOfficeById(office.getName(), office.getOfficeNumber(), office.getId());
         return "Office updated successfully";

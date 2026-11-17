@@ -8,6 +8,7 @@ public interface OfficeService {
     String saveOffice(Office office);
     List<Office> getOffices();
     String deleteOffice(Long id);
+    String deleteOfficeByNumber(int officeNumber);
     String updateOffice(Office office);
     List<Office> getFreeOffices();
     List<Object[]> getOfficesByAppointmentCount();

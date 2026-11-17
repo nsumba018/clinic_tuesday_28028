@@ -1,0 +1,2304 @@
+{
+  "info": {
+    "_postman_id": "9d2c6e41-5b7a-4c3e-8f10-2a6b7c8d9e01",
+    "name": "Kigali Clinic - Quiz 2 Completing the Backend",
+    "description": "Run the folders in order with the Collection Runner: 1) Setup creates its own data (random names, so it can be run again and again), 2) Requirements has exactly one request per requirement, named by its ID, 3) Error cases has the failing cases for the demo (404, 400, 409). baseUrl is http://localhost:8082.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Setup (run first)",
+      "item": [
+        {
+          "name": "Setup 1 - office (the doctor's own)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Own {{run}}\",\n  \"officeNumber\": {{officeOwn}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var run = Math.floor(Math.random() * 900000) + 100000;",
+                  "pm.collectionVariables.set(\"run\", run);",
+                  "function addDays(n) { return new Date(Date.now() + n * 86400000).toISOString().slice(0, 10); }",
+                  "pm.collectionVariables.set(\"dateA\", addDays(30));",
+                  "pm.collectionVariables.set(\"dateB\", addDays(31));",
+                  "pm.collectionVariables.set(\"dateC\", addDays(32));",
+                  "pm.collectionVariables.set(\"dateD\", addDays(33));",
+                  "pm.collectionVariables.set(\"officeOwn\", run * 10 + 2);",
+                  "pm.collectionVariables.set(\"officeFree\", run * 10 + 1);",
+                  "pm.collectionVariables.set(\"officeOther\", run * 10 + 3);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 2 - office (free, nobody inside)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Free {{run}}\",\n  \"officeNumber\": {{officeFree}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 3 - office (of another doctor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Other {{run}}\",\n  \"officeNumber\": {{officeOther}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 4 - read office ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/offices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "offices"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "var own = list.find(function (o) { return o.officeNumber == pm.collectionVariables.get(\"officeOwn\"); });",
+                  "var other = list.find(function (o) { return o.officeNumber == pm.collectionVariables.get(\"officeOther\"); });",
+                  "pm.test(\"Offices found\", function () { pm.expect(own !== undefined && other !== undefined).to.eql(true); });",
+                  "pm.collectionVariables.set(\"officeOwnId\", own.id);",
+                  "pm.collectionVariables.set(\"officeOtherId\", other.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 5 - specialization A",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/specializations/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "specializations",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SpecA {{run}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 6 - specialization B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/specializations/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "specializations",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SpecB {{run}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 7 - read specialization ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/specializations/specializations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "specializations",
+                "specializations"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "var a = list.find(function (s) { return s.name === \"SpecA \" + pm.collectionVariables.get(\"run\"); });",
+                  "var b = list.find(function (s) { return s.name === \"SpecB \" + pm.collectionVariables.get(\"run\"); });",
+                  "pm.test(\"Specializations found\", function () { pm.expect(a !== undefined && b !== undefined).to.eql(true); });",
+                  "pm.collectionVariables.set(\"specAId\", a.id);",
+                  "pm.collectionVariables.set(\"specBId\", b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 8 - doctor (office + SpecA)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Doc{{run}}\",\n  \"lastName\": \"Quiz{{run}}\",\n  \"dateOfBirth\": \"1980-01-01\",\n  \"office\": { \"id\": {{officeOwnId}} },\n  \"specializations\": [ { \"id\": {{specAId}} } ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 9 - another doctor (other office)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Other{{run}}\",\n  \"lastName\": \"Quiz{{run}}\",\n  \"dateOfBirth\": \"1981-01-01\",\n  \"office\": { \"id\": {{officeOtherId}} }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 10 - read doctor ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/doctors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "doctors"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "var d1 = list.find(function (d) { return d.firstName === \"Doc\" + pm.collectionVariables.get(\"run\"); });",
+                  "pm.test(\"Doctor found\", function () { pm.expect(d1 !== undefined).to.eql(true); });",
+                  "pm.collectionVariables.set(\"doctorId\", d1.id);",
+                  "pm.collectionVariables.set(\"doctorFirst\", d1.firstName);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 11 - patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/patients/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "patients",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Pat{{run}}\",\n  \"lastName\": \"Quiz{{run}}\",\n  \"dateOfBirth\": \"1990-05-05\",\n  \"ssNumber\": \"SS{{run}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200 or 201\", function () { pm.expect([200, 201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 12 - read patient id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/patients/patients",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "patients",
+                "patients"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "var found = list.find(function (x) { return x.ssNumber === \"SS\" + pm.collectionVariables.get(\"run\"); });",
+                  "pm.test(\"Found it in the list\", function () { pm.expect(found !== undefined).to.eql(true); });",
+                  "if (found) { pm.collectionVariables.set(\"patientId\", found.id); }",
+                  "pm.collectionVariables.set(\"ssNumber\", \"SS\" + pm.collectionVariables.get(\"run\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 13 - appointment A (future)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDate\": \"{{dateA}}\",\n  \"reason\": \"SetupA{{run}}\",\n  \"patient\": { \"id\": {{patientId}} },\n  \"doctor\": { \"id\": {{doctorId}} }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () { pm.expect([201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 14 - appointment B (future)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDate\": \"{{dateB}}\",\n  \"reason\": \"SetupB{{run}}\",\n  \"patient\": { \"id\": {{patientId}} },\n  \"doctor\": { \"id\": {{doctorId}} }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () { pm.expect([201].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 15 - read appointment ids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/by-status?status=SCHEDULED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "by-status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SCHEDULED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "var a = list.find(function (x) { return x.reason === \"SetupA\" + pm.collectionVariables.get(\"run\"); });",
+                  "var b = list.find(function (x) { return x.reason === \"SetupB\" + pm.collectionVariables.get(\"run\"); });",
+                  "pm.test(\"Appointments found\", function () { pm.expect(a !== undefined && b !== undefined).to.eql(true); });",
+                  "pm.collectionVariables.set(\"apptAId\", a.id);",
+                  "pm.collectionVariables.set(\"apptBId\", b.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 16 - appointment B to CONFIRMED",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptBId}}/status?status=CONFIRMED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptBId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup 17 - appointment B to COMPLETED",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptBId}}/status?status=COMPLETED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptBId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "COMPLETED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Creates its own offices, specializations, doctors, patient and appointments."
+    },
+    {
+      "name": "2 - Requirements (one request per ID)",
+      "item": [
+        {
+          "name": "A1",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/specializations/{{specBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "specializations",
+                "{{specBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Specialization added to the doctor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A2",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/specializations/{{specBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "specializations",
+                "{{specBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Specialization removed from the doctor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/free",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "free"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"The free office is in the list\", function () {",
+                  "    pm.expect(list.some(function (o) { return o.officeNumber == pm.collectionVariables.get(\"officeFree\"); })).to.eql(true);",
+                  "});",
+                  "pm.test(\"Sorted by office number\", function () {",
+                  "    var n = list.map(function (o) { return o.officeNumber; });",
+                  "    pm.expect(JSON.stringify(n)).to.eql(JSON.stringify(n.slice().sort(function (a, b) { return a - b; })));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A4",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/office?officeNumber={{officeFree}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "office"
+              ],
+              "query": [
+                {
+                  "key": "officeNumber",
+                  "value": "{{officeFree}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Office changed successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDate\": \"{{dateC}}\",\n  \"reason\": \"SetupC{{run}}\",\n  \"status\": \"COMPLETED\",\n  \"patient\": { \"id\": {{patientId}} },\n  \"doctor\": { \"id\": {{doctorId}} }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () { pm.expect([201].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Appointment Saved Successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B2",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptAId}}/status?status=CONFIRMED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptAId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Appointment status updated successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B3",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptAId}}/reschedule?newDate={{dateD}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptAId}}",
+                "reschedule"
+              ],
+              "query": [
+                {
+                  "key": "newDate",
+                  "value": "{{dateD}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Appointment rescheduled successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/save?appointmentId={{apptBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "appointmentId",
+                  "value": "{{apptBId}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineName\": \"Amoxicillin\",\n  \"dosage\": \"1 tablet, 3 times a day\",\n  \"durationDays\": 7\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", function () { pm.expect([201].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Prescription saved successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/appointment/{{apptBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "appointment",
+                "{{apptBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"At least one prescription of this appointment\", function () {",
+                  "    pm.expect(list.length > 0 && list.every(function (p) { return p.appointment.id == pm.collectionVariables.get(\"apptBId\"); })).to.eql(true);",
+                  "});",
+                  "if (list.length > 0) { pm.collectionVariables.set(\"prescriptionId\", list[0].id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/patient/{{ssNumber}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "patient",
+                "{{ssNumber}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"At least one prescription, newest issuedDate first\", function () {",
+                  "    var d = list.map(function (p) { return p.issuedDate; });",
+                  "    pm.expect(list.length > 0 && JSON.stringify(d) === JSON.stringify(d.slice().sort().reverse())).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C4",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/update/{{prescriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "update",
+                "{{prescriptionId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineName\": \"Ibuprofen\",\n  \"dosage\": \"1 tablet, twice a day\",\n  \"durationDays\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Prescription updated successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/agenda?date={{dateD}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "agenda"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{dateD}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"Appointments of that doctor on that date, none CANCELLED\", function () {",
+                  "    pm.expect(list.length > 0 && list.every(function (a) { return a.status !== \"CANCELLED\" && a.appointmentDate === pm.collectionVariables.get(\"dateD\"); })).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/patients/{{ssNumber}}/upcoming",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "patients",
+                "{{ssNumber}}",
+                "upcoming"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"Only SCHEDULED or CONFIRMED, today or later, soonest first\", function () {",
+                  "    var today = new Date().toISOString().slice(0, 10);",
+                  "    var d = list.map(function (a) { return a.appointmentDate; });",
+                  "    var ok = list.length > 0 && list.every(function (a) { return (a.status === \"SCHEDULED\" || a.status === \"CONFIRMED\") && a.appointmentDate >= today; });",
+                  "    pm.expect(ok && JSON.stringify(d) === JSON.stringify(d.slice().sort())).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/search?name={{doctorFirst}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "{{doctorFirst}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var list = pm.response.json();",
+                  "pm.test(\"Finds the doctor by name\", function () {",
+                  "    pm.expect(list.some(function (d) { return d.firstName === pm.collectionVariables.get(\"doctorFirst\"); })).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D4",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "summary"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var s = pm.response.json();",
+                  "pm.test(\"Six numbers in the right order\", function () {",
+                  "    pm.expect(JSON.stringify(Object.keys(s))).to.eql(JSON.stringify([\"patients\", \"doctors\", \"freeOffices\", \"appointmentsToday\", \"scheduled\", \"prescriptions\"]));",
+                  "    pm.expect(Object.keys(s).every(function (k) { return typeof s[k] === \"number\"; })).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BN1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/stats/top-medicines",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "stats",
+                "top-medicines"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var rows = pm.response.json();",
+                  "pm.test(\"Rows are [medicine, count], most prescribed first\", function () {",
+                  "    var c = rows.map(function (r) { return r[1]; });",
+                  "    pm.expect(rows.length > 0 && rows.every(function (r) { return r.length === 2; }) && JSON.stringify(c) === JSON.stringify(c.slice().sort(function (a, b) { return b - a; }))).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BN2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/workload?start=2000-01-01&end=2100-01-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "workload"
+              ],
+              "query": [
+                {
+                  "key": "start",
+                  "value": "2000-01-01"
+                },
+                {
+                  "key": "end",
+                  "value": "2100-01-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var rows = pm.response.json();",
+                  "pm.test(\"Rows are [first, last, count], busiest first, includes our doctor\", function () {",
+                  "    var c = rows.map(function (r) { return r[2]; });",
+                  "    var mine = rows.some(function (r) { return r[0] === pm.collectionVariables.get(\"doctorFirst\") && r[2] >= 1; });",
+                  "    pm.expect(mine && JSON.stringify(c) === JSON.stringify(c.slice().sort(function (a, b) { return b - a; }))).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 - Error cases for the demo",
+      "item": [
+        {
+          "name": "A3 after A4 - the old office is free again",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/offices/free",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "offices",
+                "free"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "pm.test(\"Old office of the doctor is now free\", function () {",
+                  "    pm.expect(list.some(function (o) { return o.officeNumber == pm.collectionVariables.get(\"officeOwn\"); })).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A1 error 404 - doctor not found",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/999999/specializations/{{specBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "999999",
+                "specializations",
+                "{{specBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The doctor with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A1 error 404 - specialization not found",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/specializations/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "specializations",
+                "999999"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"That specialization does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A1 error 409 - doctor already has it",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/specializations/{{specAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "specializations",
+                "{{specAId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", function () { pm.expect([409].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The doctor already has that specialization\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A2 error 409 - doctor does not have it",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/specializations/{{specBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "specializations",
+                "{{specBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", function () { pm.expect([409].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The doctor does not have that specialization\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A2 error 404 - doctor not found",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/999999/specializations/{{specBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "999999",
+                "specializations",
+                "{{specBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The doctor with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A4 error 409 - office taken by another doctor",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/office?officeNumber={{officeOther}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "office"
+              ],
+              "query": [
+                {
+                  "key": "officeNumber",
+                  "value": "{{officeOther}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", function () { pm.expect([409].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"That office is taken by other doctor\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "A4 error 404 - office not found",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/{{doctorId}}/office?officeNumber=999999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "{{doctorId}}",
+                "office"
+              ],
+              "query": [
+                {
+                  "key": "officeNumber",
+                  "value": "999999999"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The office with that office number does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B1 error 400 - date in the past",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "save"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointmentDate\": \"2000-01-01\",\n  \"reason\": \"past\",\n  \"patient\": { \"id\": {{patientId}} },\n  \"doctor\": { \"id\": {{doctorId}} }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () { pm.expect([400].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Appointment date cannot be in the past\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B1 check - status was forced to SCHEDULED",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/by-status?status=SCHEDULED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "by-status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SCHEDULED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var list = pm.response.json();",
+                  "pm.test(\"Appointment sent as COMPLETED is stored as SCHEDULED\", function () {",
+                  "    pm.expect(list.some(function (a) { return a.reason === \"SetupC\" + pm.collectionVariables.get(\"run\"); })).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B2 error 400 - COMPLETED is final",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptBId}}/status?status=SCHEDULED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptBId}}",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SCHEDULED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () { pm.expect([400].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Cannot change status from COMPLETED to SCHEDULED\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B2 error 404 - appointment not found",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/999999/status?status=CONFIRMED",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "999999",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CONFIRMED"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The appointment with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B3 error 400 - COMPLETED cannot be rescheduled",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptBId}}/reschedule?newDate={{dateD}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptBId}}",
+                "reschedule"
+              ],
+              "query": [
+                {
+                  "key": "newDate",
+                  "value": "{{dateD}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () { pm.expect([400].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"A COMPLETED appointment cannot be rescheduled\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B3 error 409 - doctor already booked",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptAId}}/reschedule?newDate={{dateC}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptAId}}",
+                "reschedule"
+              ],
+              "query": [
+                {
+                  "key": "newDate",
+                  "value": "{{dateC}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", function () { pm.expect([409].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Doctor is already booked on that date\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "B3 error 400 - date in the past",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptAId}}/reschedule?newDate=2000-01-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptAId}}",
+                "reschedule"
+              ],
+              "query": [
+                {
+                  "key": "newDate",
+                  "value": "2000-01-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () { pm.expect([400].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Appointment date cannot be in the past\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C1 error 400 - appointment is not COMPLETED",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/save?appointmentId={{apptAId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "appointmentId",
+                  "value": "{{apptAId}}"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineName\": \"X\",\n  \"dosage\": \"1\",\n  \"durationDays\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", function () { pm.expect([400].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Prescriptions are only for COMPLETED appointments\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C1 error 404 - appointment not found",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/save?appointmentId=999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "appointmentId",
+                  "value": "999999"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineName\": \"X\",\n  \"dosage\": \"1\",\n  \"durationDays\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The appointment with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C2 error 404 - appointment not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/appointment/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "appointment",
+                "999999"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The appointment with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C4 error 404 - prescription not found",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/update/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "update",
+                "999999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicineName\": \"X\",\n  \"dosage\": \"1\",\n  \"durationDays\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The prescription with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C4 error 409 - appointment has prescriptions",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{apptBId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{apptBId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", function () { pm.expect([409].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"That appointment has prescriptions, delete them first\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C4 success - delete the prescription",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/delete/{{prescriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "delete",
+                "{{prescriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () { pm.expect([200].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"Prescription deleted successfully\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "C4 error 404 - prescription already deleted",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/prescriptions/delete/{{prescriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "prescriptions",
+                "delete",
+                "{{prescriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The prescription with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D1 error 404 - doctor not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/999999/agenda?date={{dateD}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "doctors",
+                "999999",
+                "agenda"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "{{dateD}}"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"The doctor with that id does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "D2 error 404 - patient not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/patients/NOSUCHSS/upcoming",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "patients",
+                "NOSUCHSS",
+                "upcoming"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", function () { pm.expect([404].includes(pm.response.code)).to.eql(true); });",
+                  "pm.test(\"Message is correct\", function () { pm.expect(pm.response.text()).to.eql(\"That patient with that ssnumber does not exist\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
